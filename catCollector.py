@@ -9,6 +9,19 @@ from yardClass import *
 from catClass import *
 from keyPressedFunctions import *
 from mousePressedFunctions import *
+from PIL import Image
+import os
+
+rootdir = os.getcwd()
+
+def getImagePath(imageName): # to open images
+    for subdir, dirs, files in os.walk(rootdir):
+        for file in files:
+            #print os.path.join(subdir, file)
+            filepath = subdir + os.sep + file
+
+            if filepath.endswith(f"/{imageName}.png") or filepath.endswith(f"/{imageName}.jpg"):
+                return (filepath)
 
 def appStarted(app):
     initializeShop(app)
@@ -304,33 +317,33 @@ def timerFired(app):
 def redrawAll(app, canvas):
     if app.currentPage == "new game?":
         canvas.create_rectangle(0, 0, 375, 667, fill = "#C4D3D9")
-        display = ImageTk.PhotoImage(Image.open(f'new game? {app.instructionsFrame}.png'))
+        display = ImageTk.PhotoImage(Image.open(getImagePath(f'new game? {app.instructionsFrame}')))
         canvas.create_image(0,0, anchor=NW, image=display)
     elif app.currentPage == "instructions":
-        display = ImageTk.PhotoImage(Image.open(f'instructions{app.instructionsFrame}.jpg'))
+        display = ImageTk.PhotoImage(Image.open(getImagePath(f'instructions{app.instructionsFrame}')))
         canvas.create_image(0,0, anchor=NW, image=display)
     elif app.currentPage == "yard":
-        display = ImageTk.PhotoImage(Image.open('background.jpg'))
+        display = ImageTk.PhotoImage(Image.open(getImagePath('background')))
         canvas.create_image(0,0, anchor=NW, image=display)
         drawYard(app, canvas)
         if app.playSleepAnimation == True:
             canvas.create_rectangle(0, 0, 375, 667, fill = "#C4D3D9")
-            display = ImageTk.PhotoImage(Image.open(f'zzz {app.sleepFrame%6}.png'))
+            display = ImageTk.PhotoImage(Image.open(getImagePath(f'zzz {app.sleepFrame%6}')))
             canvas.create_image(0,0, anchor=NW, image=display)
     elif app.currentPage == "cats":
-        display = ImageTk.PhotoImage(Image.open('cat background.jpg'))
+        display = ImageTk.PhotoImage(Image.open(getImagePath('cat background')))
         canvas.create_image(0,0, anchor=NW, image=display)
         drawCatProfile(app, canvas, app.cats[app.catsList[app.catsPageNumber]]) # i promise this works 
     elif app.currentPage == "shop":
-        display = ImageTk.PhotoImage(Image.open('shop.jpg'))
+        display = ImageTk.PhotoImage(Image.open(getImagePath('shop')))
         canvas.create_image(0,0, anchor=NW, image=display)
         drawShop(app, canvas)
     elif app.currentPage == "goodies":
-        display = ImageTk.PhotoImage(Image.open('goodies.jpg'))
+        display = ImageTk.PhotoImage(Image.open(getImagePath('goodies')))
         canvas.create_image(0,0, anchor=NW, image=display)
         drawGoodies(app, canvas)
     elif app.currentPage == "gifts":
-        display = ImageTk.PhotoImage(Image.open('gifts.jpg'))
+        display = ImageTk.PhotoImage(Image.open(getImagePath('gifts')))
         canvas.create_image(0,0, anchor=NW, image = display)
         drawGiftsPage(app, canvas)
     # we draw money if overlay == none and currentPage != instructions
@@ -338,21 +351,20 @@ def redrawAll(app, canvas):
         drawMoney(app, canvas)
     # keep sleep and menu at the end!!!!
     if app.overlay == "menu": # draws over current image
-        display = ImageTk.PhotoImage(Image.open('menu.png'))
+        display = ImageTk.PhotoImage(Image.open(getImagePath('menu')))
         canvas.create_image(0,0, anchor=NW, image=display)
         if len(app.giftsNotReceived) > 0:
-            display = display = ImageTk.PhotoImage(Image.open('gifts not received tag.png'))
+            display = display = ImageTk.PhotoImage(Image.open(getImagePath('gifts not received tag')))
             canvas.create_image(0,0, anchor=NW, image=display)
     elif app.overlay == "sleep":
-        display = ImageTk.PhotoImage(Image.open('sleep.png'))
+        display = ImageTk.PhotoImage(Image.open(getImagePath('sleep')))
         canvas.create_image(0,0, anchor=NW, image=display)
     elif app.overlay == "no money":
-        display = ImageTk.PhotoImage(Image.open(f'no money {app.sparkleFrame}.png'))
+        display = ImageTk.PhotoImage(Image.open(getImagePath(f'no money {app.sparkleFrame}')))
         canvas.create_image(0,0, anchor=NW, image=display)
     elif app.overlay == "best arrangement instructions":
         drawStartBackTracking(app, canvas)
 
-    
 
 def drawMoney(app, canvas):
     canvas.create_text(10, 640, anchor = NW, 
@@ -364,7 +376,7 @@ def drawYard(app, canvas): # draws items! not the background itself
         if app.myYard.itemPositions[position] != False:
             item = app.myYard.itemPositions[position]
             x,y = position.coordinates()
-            display = ImageTk.PhotoImage(Image.open(f"{item}.png"))
+            display = ImageTk.PhotoImage(Image.open(getImagePath(f"{item}")))
             canvas.create_image(x, y + 60, anchor = S, image = display)
             if app.myYard.catPositions[position] != False:
                 cat = app.myYard.catPositions[position]
@@ -373,12 +385,12 @@ def drawYard(app, canvas): # draws items! not the background itself
 
 
     # leave tree stump at the end
-    display = ImageTk.PhotoImage(Image.open('tree stump.png'))
+    display = ImageTk.PhotoImage(Image.open(getImagePath('tree stump')))
     canvas.create_image(375, 667, anchor=SE, image=display)
     if app.myYard.itemPositions[app.stump] != False:
         item = app.myYard.itemPositions[position]
         x,y = position.coordinates()
-        display = ImageTk.PhotoImage(Image.open(f"{item}.png"))
+        display = ImageTk.PhotoImage(Image.open(getImagePath(f"{item}")))
         canvas.create_image(x, y + 60, anchor = S, image = display)
         if app.myYard.catPositions[app.stump] != False:
                 cat = app.myYard.catPositions[app.stump]
@@ -387,35 +399,35 @@ def drawYard(app, canvas): # draws items! not the background itself
     if app.myYard.food == None: 
         drawArrow(app, canvas, (110, 610))
         if app.overlay == "place food":
-            display = ImageTk.PhotoImage(Image.open(f"place {app.chooseFoodType}.png"))
+            display = ImageTk.PhotoImage(Image.open(getImagePath(f"place {app.chooseFoodType}")))
             canvas.create_image(0, 0, anchor = NW, image = display)
             canvas.create_text(100, 227, anchor = NW, 
             text = f"Place {app.chooseFoodType}? {app.myInventory.pantry[app.chooseFoodType]} in stock", 
             fill = "#9c3337", font = "Inter 12 bold")
             if app.myInventory.pantry[app.chooseFoodType] < 1:
-                display = ImageTk.PhotoImage(Image.open("food item unavailable 0.png"))
+                display = ImageTk.PhotoImage(Image.open(getImagePath("food item unavailable 0.png")))
                 canvas.create_image(0, 0, anchor = NW, image = display)
     else: # app.myYard.food has something
         drawItem(app, canvas, app.myYard.food, "food") 
         if app.overlay == "display food level":
-            display = ImageTk.PhotoImage(Image.open(f"food level {app.myYard.foodLevel}.png"))
+            display = ImageTk.PhotoImage(Image.open(getImagePath(f"food level {app.myYard.foodLevel}")))
             canvas.create_image(0, 0, anchor = NW, image = display)
-            display = ImageTk.PhotoImage(Image.open(f"{app.myYard.food}.png"))
+            display = ImageTk.PhotoImage(Image.open(getImagePath(f"{app.myYard.food}")))
             canvas.create_image(94, 254, anchor = NW, image = display)
             canvas.create_text(120, 252, anchor = NW, text = f"{app.myYard.food}",
             font = "Inter 12 bold", fill = "#9c3337")
     if app.playSolutionAnimation == True:
         if app.startSolutionFrame < 14:
             canvas.create_rectangle(0, 0, 375, 667, fill = "#C4D3D9")
-            display = ImageTk.PhotoImage(Image.open(f'start best arrangement 17.png'))
+            display = ImageTk.PhotoImage(Image.open(getImagePath(f'start best arrangement 17')))
             canvas.create_image(0,0, anchor=NW, image = display)
             drawCatCells(app, canvas)
-        display = ImageTk.PhotoImage(Image.open(f'loading best arrangement {app.startSolutionFrame}.png'))
+        display = ImageTk.PhotoImage(Image.open(getImagePath(f'loading best arrangement {app.startSolutionFrame}')))
         canvas.create_image(0,0, anchor = NW, image = display)
 
 def drawCatProfile(app, canvas, cat):
     if cat.visits == 0:
-        display = ImageTk.PhotoImage(Image.open(f"mystery profile picture {app.catFrame}.png"))
+        display = ImageTk.PhotoImage(Image.open(getImagePath(f"mystery profile picture {app.catFrame}")))
         canvas.create_text(191, 227, text = "?????", anchor = NW, fill = "#30849D", font = "Inter 12 bold")
         canvas.create_text(202, 250, text = "?????", anchor = NW, fill = "#30849D", font = "Inter 12 bold")
         canvas.create_text(277, 274, text = "?????", anchor = NW, fill = "#30849D", font = "Inter 12 bold")
@@ -424,7 +436,7 @@ def drawCatProfile(app, canvas, cat):
         canvas.create_text(137, 381, text = "?????", anchor = NW, fill = "#30849D", font = "Inter 12 bold")
         canvas.create_text(18, 453, text = f"Prefers the {cat.favoriteItem.lower()} \nplaced on the {cat.favoritePosition}", anchor = NW, fill = "#30849D", font = "Inter 12 bold")
     elif cat.visits > 0:
-        display = ImageTk.PhotoImage(Image.open(f"{cat.name} profile picture {app.catFrame}.png"))
+        display = ImageTk.PhotoImage(Image.open(getImagePath(f"{cat.name} profile picture {app.catFrame}")))
         canvas.create_text(191, 227, text = f"{cat.name}", anchor = NW, fill = "#30849D", font = "Inter 12 bold")
         canvas.create_text(202, 250, text = f"{cat.breed}", anchor = NW, fill = "#30849D", font = "Inter 12 bold")
         canvas.create_text(277, 274, text = f"{cat.personality}", anchor = NW, fill = "#30849D", font = "Inter 12 bold")
@@ -442,7 +454,7 @@ def drawShop(app, canvas):
             if item in app.myInventory.catalog:
                 drawItemPurchased(app, canvas, cell)
         if app.cellOfItem != None:
-            display = ImageTk.PhotoImage(Image.open('buy pop up.png'))
+            display = ImageTk.PhotoImage(Image.open(getImagePath('buy pop up')))
             canvas.create_image(0,0, anchor=NW, image=display)
             # find the item that matches up to the cell of app.cellOfItem
             if getItem(app)!= None: item = getItem(app)
@@ -454,7 +466,7 @@ def drawShop(app, canvas):
             if item in app.myInventory.catalog:
                 drawItemPurchased(app, canvas, cell)
         if app.cellOfItem != None:
-            display = ImageTk.PhotoImage(Image.open('buy pop up.png'))
+            display = ImageTk.PhotoImage(Image.open(getImagePath('buy pop up')))
             canvas.create_image(0,0, anchor=NW, image=display)
             if getItem(app)!= None: item = getItem(app)
             drawItem(app, canvas, item, "buy pop up")
@@ -465,7 +477,7 @@ def drawShop(app, canvas):
             if item in app.myInventory.catalog:
                 drawItemPurchased(app, canvas, cell)
         if app.cellOfItem != None:
-            display = ImageTk.PhotoImage(Image.open('buy pop up.png'))
+            display = ImageTk.PhotoImage(Image.open(getImagePath('buy pop up')))
             canvas.create_image(0,0, anchor=NW, image=display)
             if getItem(app)!= None: item = getItem(app)
             drawItem(app, canvas, item, "buy pop up")
@@ -476,7 +488,7 @@ def drawShop(app, canvas):
             if item in app.myInventory.catalog:
                 drawItemPurchased(app, canvas, cell)
         if app.cellOfItem != None:
-            display = ImageTk.PhotoImage(Image.open('buy pop up.png'))
+            display = ImageTk.PhotoImage(Image.open(getImagePath('buy pop up')))
             canvas.create_image(0,0, anchor=NW, image=display)
             if getItem(app)!= None: item = getItem(app)
             drawItem(app, canvas, item, "buy pop up")
@@ -487,7 +499,7 @@ def drawShop(app, canvas):
             if item in app.myInventory.catalog:
                 drawItemPurchased(app, canvas, cell)
         if app.cellOfItem != None:
-            display = ImageTk.PhotoImage(Image.open('buy pop up.png'))
+            display = ImageTk.PhotoImage(Image.open(getImagePath('buy pop up')))
             canvas.create_image(0,0, anchor=NW, image=display)
             if getItem(app)!= None: item = getItem(app)
             drawItem(app, canvas, item, "buy pop up")
@@ -498,13 +510,13 @@ def drawShop(app, canvas):
             if item in app.myInventory.catalog:
                 drawItemPurchased(app, canvas, cell)
         if app.cellOfItem != None:
-            display = ImageTk.PhotoImage(Image.open('buy pop up.png'))
+            display = ImageTk.PhotoImage(Image.open(getImagePath('buy pop up')))
             canvas.create_image(0,0, anchor=NW, image=display)
             if getItem(app)!= None: item = getItem(app)
             drawItem(app, canvas, item, "buy pop up")
 
 def drawItemPurchased(app, canvas, cell):
-    display = ImageTk.PhotoImage(Image.open(f'purchased {app.sparkleFrame}.png'))
+    display = ImageTk.PhotoImage(Image.open(getImagePath(f'purchased {app.sparkleFrame}')))
     if cell == "UL":
         x, y = (6, 137)
     elif cell == "UR":
@@ -533,7 +545,7 @@ def drawItem(app, canvas, item, position):
         x0, y0 = 120, 372
     elif position == "food":
         x, y = 22, 520
-        display = ImageTk.PhotoImage(Image.open(f'{item}.png'))
+        display = ImageTk.PhotoImage(Image.open(getImagePath(f'{item}')))
         canvas.create_image(x, y, anchor = NW, image = display)
     # item positions:  
     # top left (4, 139), text (27, 269)
@@ -553,19 +565,19 @@ def drawItem(app, canvas, item, position):
         x0, y0 = 210, 420 
     if moneyType == "goldfish":
         if app.currentPage == "shop": # draw white background and sparkle for goldfish items
-            display = ImageTk.PhotoImage(Image.open('whiteBackground.png'))
+            display = ImageTk.PhotoImage(Image.open(getImagePath('whiteBackground')))
             canvas.create_image(x, y, anchor = NW, image = display)
-            itemImage = ImageTk.PhotoImage(Image.open(f'{item}.png'))
+            itemImage = ImageTk.PhotoImage(Image.open(getImagePath(f'{item}')))
             canvas.create_image(x, y, anchor = NW, image = itemImage)
             canvas.create_text(x0, y0, anchor = NW, text = f"Price: {price} Goldfish", fill = "#e8be79",
             font = "Inter 12 bold")
-            sparkle = ImageTk.PhotoImage(Image.open(f'sparkle{app.sparkleFrame}.png'))
+            sparkle = ImageTk.PhotoImage(Image.open(getImagePath(f'sparkle{app.sparkleFrame}')))
             canvas.create_image(x, y, anchor=NW, image = sparkle) 
         elif app.currentPage == "goodies": # do not want white background on goodies page
-            itemImage = ImageTk.PhotoImage(Image.open(f'{item}.png'))
+            itemImage = ImageTk.PhotoImage(Image.open(getImagePath(f'{item}')))
             canvas.create_image(x, y, anchor = NW, image = itemImage)
     if moneyType == "fish":
-        itemImage = ImageTk.PhotoImage(Image.open(f'{item}.png'))
+        itemImage = ImageTk.PhotoImage(Image.open(getImagePath(f'{item}')))
         canvas.create_image(x, y, anchor = NW, image = itemImage)
         if app.currentPage == "shop":
             canvas.create_text(x0, y0, anchor = NW, text = f"Price: {price} Fish", fill = "#6ea6bd",
@@ -618,13 +630,13 @@ def drawGoodiesPage(app, canvas):
             if item in app.myInventory.placed:
                 drawAlreadyPlaced(app, canvas, cell)
     if app.chosenItemPosition != None and (app.itemToPlace in app.myInventory.catalog):
-        display = ImageTk.PhotoImage(Image.open('yes or no.png'))
+        display = ImageTk.PhotoImage(Image.open(getImagePath('yes or no')))
         canvas.create_image(0,0, anchor=NW, image=display)
         drawItem(app, canvas, app.itemToPlace, "place pop up")
     return None
         
 def drawAlreadyPlaced(app, canvas, cell):
-    display = ImageTk.PhotoImage(Image.open(f'already placed {app.goodiesFrame}.png'))
+    display = ImageTk.PhotoImage(Image.open(getImagePath(f'already placed {app.goodiesFrame}')))
     if cell == "UL":
         x, y = (6, 138)
     elif cell == "UR":
@@ -636,7 +648,7 @@ def drawAlreadyPlaced(app, canvas, cell):
     canvas.create_image(x,y, anchor=NW, image=display)
 
 def drawItemUnavailable(app, canvas, cell):
-    display = ImageTk.PhotoImage(Image.open(f'item not available {app.goodiesFrame}.png'))
+    display = ImageTk.PhotoImage(Image.open(getImagePath(f'item not available {app.goodiesFrame}')))
     if cell == "UL":
         x, y = (6, 138)
     elif cell == "UR":
@@ -649,15 +661,15 @@ def drawItemUnavailable(app, canvas, cell):
     
 def drawYardPositions(app, canvas): # for placing goods
     # draw background
-    display = ImageTk.PhotoImage(Image.open('background.jpg'))
+    display = ImageTk.PhotoImage(Image.open(getImagePath('background')))
     canvas.create_image(0,0, anchor=NW, image=display)
     drawYard(app, canvas)
-    treeStump = ImageTk.PhotoImage(Image.open('tree stump.png'))
+    treeStump = ImageTk.PhotoImage(Image.open(getImagePath('tree stump')))
     canvas.create_image(375, 667, anchor=SE, image=treeStump)
     if app.myYard.itemPositions[app.stump] != False: 
         item = app.myYard.itemPositions[app.stump]
         x,y = app.stump.coordinates()
-        display = ImageTk.PhotoImage(Image.open(f"{item}.png"))
+        display = ImageTk.PhotoImage(Image.open(getImagePath(f"{item}")))
         canvas.create_image(x, y + 60, anchor = S, image = display)
         if app.myYard.catPositions[app.stump] != False:
                 cat = app.myYard.catPositions[app.stump]
@@ -670,7 +682,7 @@ def drawYardPositions(app, canvas): # for placing goods
 
 def drawArrow(app, canvas, coordinates):
     x, y = coordinates
-    display = ImageTk.PhotoImage(Image.open('arrow.png'))
+    display = ImageTk.PhotoImage(Image.open(getImagePath('arrow')))
     if app.currentPage == "goodies" and coordinates != (110, 610): # exclude food
         arrowDisplacement = [0, 3, 6, 4, 2]
         canvas.create_image(x, y - arrowDisplacement[app.goodiesFrame], anchor = S, image = display)
@@ -699,25 +711,25 @@ def drawGiftCell(app, canvas, gift, cell):
     y = 100 + cell*110
     canvas.create_text(140, y, anchor = NW, text = f"{gift.givenFrom} gifted \nyou {gift.quantity} {gift.moneyType}!",
     font = "Inter 14 bold", fill = "#7D3E3B")
-    display = ImageTk.PhotoImage(Image.open(f'{gift.givenFrom} tiny face.png'))
+    display = ImageTk.PhotoImage(Image.open(getImagePath(f'{gift.givenFrom} tiny face')))
     y = 110 + cell*110
     canvas.create_image(60, y, anchor = NW, image = display) 
 
 def drawCatPose(app, canvas, cat, item, coordinates):
     x, y = coordinates
     if item in app.balls:
-        display = ImageTk.PhotoImage(Image.open(f'{cat.name} sleeping.png'))
+        display = ImageTk.PhotoImage(Image.open(getImagePath(f'{cat.name} sleeping')))
         canvas.create_image(x, y + 30, anchor = S, image = display) 
     if item in app.lowSittingPillows:
-        display = ImageTk.PhotoImage(Image.open(f'{cat.name} sitting.png')) 
+        display = ImageTk.PhotoImage(Image.open(getImagePath(f'{cat.name} sitting'))) 
         canvas.create_image(x, y + 30, anchor = S, image = display) 
     if item in app.highSittingPillows:
-        display = ImageTk.PhotoImage(Image.open(f'{cat.name} sleeping.png'))
+        display = ImageTk.PhotoImage(Image.open(getImagePath(f'{cat.name} sleeping')))
         canvas.create_image(x - 3, y + 8, anchor = S, image = display) 
     if item in app.houses: 
-        display = ImageTk.PhotoImage(Image.open(f'{cat.name} sleeping.png'))
+        display = ImageTk.PhotoImage(Image.open(getImagePath(f'{cat.name} sleeping')))
         canvas.create_image(x + 1, y + 57, anchor = S, image = display) 
-        display = display = ImageTk.PhotoImage(Image.open(f'{item} top.png'))
+        display = display = ImageTk.PhotoImage(Image.open(getImagePath(f'{item} top')))
         canvas.create_image(x, y - 18, image = display) 
 
 def mousePressedGifts(app, x, y):
@@ -1001,13 +1013,13 @@ def drawStartBackTracking(app, canvas):
     canvas.create_rectangle(0, 0, 375, 667, fill = "#C4D3D9")
     frame = app.timePassed - app.startBestArrangementAnimationTime + 1
     if frame <= 17:
-        display = ImageTk.PhotoImage(Image.open(f'start best arrangement {frame}.png'))
+        display = ImageTk.PhotoImage(Image.open(getImagePath(f'start best arrangement {frame}')))
     elif frame > 17:
-        display = ImageTk.PhotoImage(Image.open(f'start best arrangement 17.png'))
+        display = ImageTk.PhotoImage(Image.open(getImagePath(f'start best arrangement 17')))
     if app.solution == "does not exist":
-        display = ImageTk.PhotoImage(Image.open(f'sol does not exist.png'))
+        display = ImageTk.PhotoImage(Image.open(getImagePath(f'sol does not exist')))
     elif app.solution == "choose 5":
-        display = ImageTk.PhotoImage(Image.open(f'choose 5.png'))
+        display = ImageTk.PhotoImage(Image.open(getImagePath(f'choose 5')))
     canvas.create_image(0,0, anchor=NW, image = display)
     if frame > 17: drawCatCells(app, canvas)
     return None
@@ -1019,10 +1031,10 @@ def drawCatCells(app, canvas):
             x = 38 + col*60
             cellNumber = row*5 + col
             catName = app.catsList[cellNumber]
-            display = ImageTk.PhotoImage(Image.open(f'{catName} tiny face.png'))
+            display = ImageTk.PhotoImage(Image.open(getImagePath(f'{catName} tiny face')))
             canvas.create_image(x, y, anchor = NW, image = display)
             if catName in app.setOfCats: # draw checkmark
-                display = ImageTk.PhotoImage(Image.open(f'check.png'))
+                display = ImageTk.PhotoImage(Image.open(getImagePath(f'check')))
                 canvas.create_image(x + 3, y - 4, anchor = NW, image = display)
                 
 
