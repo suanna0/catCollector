@@ -5,3 +5,5 @@ Run the project by opening the file “catCollector.py” and hitting Command B.
 
 
 To simulate time passing and receive gifts from cats faster, press ’s’ and choose one of the sleep options.
+
+Demo Video: https://youtu.be/tHjvNxuliWo
